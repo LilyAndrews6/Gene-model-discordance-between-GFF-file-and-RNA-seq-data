@@ -1,0 +1,65 @@
+https://veupathdb.globusgenomics.org/u/landrews06-482193373/w/single-rna-seq-data-exported
+#Start of python code
+coord_gene = []
+coord_gene1 = []
+coord_gene2 = []
+coord_exon = []
+coord_exon1 = []
+coord_exon2 = []
+#gff_file = open("FungiDB-36_HcapsulatumG217B.gff", "r") original file has been shortened to the length of the bedgraph file
+gff_file = open("Contig1161_400000.gff", "r") #smaller data set file to compare with bedgraph file, Positive control test: TEST.txt
+gff_file.readline() #remove first line
+for l in gff_file:
+    if not l.startswith("#"): #ignore lines that starts with #
+        l_strip = l.strip("\n") #remove \n at end of line
+        l_remove = l_strip.split("\t") #remove tab spaces
+        if "mRNA" in l: #search for mRNA
+            gene_coord1 = l_remove[3]  # start coordinate
+            gene_coord2 = l_remove[4]  # end coordinate
+            genes = l_remove[2], l_remove[3], l_remove[4]#pull out start and end coordinates and mRNA
+            coord_gene.append(genes) #whole information
+            coord_gene1.append(gene_coord1) #start coordinate
+            coord_gene2.append(gene_coord2) #end coordinate
+        if "exon" in l: #search for exon
+            exon_coord1 = l_remove[3]  # start coordinate
+            exon_coord2 = l_remove[4]  # end coordinate
+            exons = l_remove[2], l_remove[3], l_remove[4]#pull out start and end coordinates and exon
+            coord_exon.append(exons) #whole information
+            coord_exon1.append(exon_coord1) #start coordinate
+            coord_exon2.append(exon_coord2) #end coordinate
+#print("Gene coord", coord_gene1)
+coord_above_threshold =[]
+bedgraph_file = open("BigWig BAM to BigWig on data 22-HISTO_ZL.Contig1161-410001..448400.bedgraph", "r")#read in bedgraph
+bedgraph_file.readline() #discard first line
+for line in bedgraph_file:
+    line_strip = line.strip("\n") #remove end of line space
+    line_remove = line_strip.split("\t") #remove space between elements
+    coverage = line_remove[3] #coverage number
+    start = line_remove[1] #start coordinate
+    end = line_remove[2] #end coordinate
+    if int(coverage) > 15: #Threshold of above 15
+        above_threshold = line_remove[1], line_remove[2], line_remove[3] #list start coordinate, end coordinate and coverage
+        coord_above_threshold.append(above_threshold)
+result_gene_start = [] # list for results of genes
+result_gene_end = [] # list for results of genes
+result_exon_start = [] #list for result of exons
+result_exon_end = [] #list for result of exons
+for element in coord_above_threshold:
+    cov_start = element[0] #start coordinate
+    cov_end = element[1] #end coordinate
+    if cov_start in coord_gene1: #compare both start coordinate lists
+        result_gene_start.append(cov_start) #add to same start list
+    if cov_end in coord_gene2: #compare both end coordinate lists
+        result_gene_end.append(cov_end) #add to same end list
+for element in coord_above_threshold:
+    cov_start = element[0] #start coordinate
+    cov_end = element[1] #end coordinate
+    if cov_start in coord_exon1: #compare both start coordinate lists
+        result_exon_start.append(cov_start) #add to same start list
+        #print(cov_start)
+    if cov_end in coord_exon2: #compare both end coordinate lists
+        result_exon_end.append(cov_end) #add to same end list
+print("mRNA coordinate similarity at start: ", result_gene_start)
+print("mRNA coordinate similarity at end: ", result_gene_end)
+print("Exon coordinate similarity at start: ", result_exon_start)
+print("Exon coordinate similarity at end: ", result_exon_end)
