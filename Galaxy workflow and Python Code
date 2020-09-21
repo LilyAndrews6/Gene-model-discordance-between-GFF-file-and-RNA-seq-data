@@ -1,5 +1,6 @@
+#Galaxy workflow converting single stranded RNA-seq data (fasta file) to BigWig file in FungiDB (or EupathDB equivalent)
 https://veupathdb.globusgenomics.org/u/landrews06-482193373/w/single-rna-seq-data-exported
-#Start of python code
+#Python code to display discordance between GFF file and coverage plot
 coord_gene = []
 coord_gene1 = []
 coord_gene2 = []
